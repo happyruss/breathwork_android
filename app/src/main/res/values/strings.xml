@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Healing Breathwork</string>
+    <string name="meditation_name_placeholder">Meditation Name</string>
+    <string name="url">http://www.guidedmeditationtreks.com/healing-breathwork.html</string>
+    <string name="pickASession">Pick a session to Begin</string>
+    <string name="background_image">background image</string>
+    <string name="back">Back</string>
+    <string name="app_info_link">app info link</string>
 </resources>

@@ -8,8 +8,8 @@ android {
         applicationId "com.guidedmeditationtreks.breathwork"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 17
-        versionName "1.2"
+        versionCode 1
+        versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

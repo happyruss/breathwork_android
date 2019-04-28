@@ -74,10 +74,6 @@ class MainActivity : AppCompatActivity() {
             val button = linearLayout.findViewById<Button>(trackTemplate.buttonId)
             button.isEnabled = true
 
-            if (isNotLastTrack) {
-                val dots = this.findViewById<ImageView>(trackTemplate.spacerId)
-                dots.setBackgroundResource(R.mipmap.dots)
-            }
         }
 
         val medHours = breathworkManager.userTotalSecondsInMeditation / 3600
@@ -95,7 +91,6 @@ class MainActivity : AppCompatActivity() {
         for (i in 0 until trackCount) {
             val trackTemplate = trackTemplateFactory.getTrackTemplate(i)
             trackTemplate.buttonId = View.generateViewId()
-            trackTemplate.spacerId = View.generateViewId()
 
             val v = LayoutInflater.from(this).inflate(R.layout.button_template, null)
             val button = v.findViewById<Button>(R.id.templateButton)
@@ -107,12 +102,6 @@ class MainActivity : AppCompatActivity() {
             val parent = button.parent as LinearLayout
             parent.removeView(button)
             linearLayout.addView(button)
-            if (i < trackCount - 1) {
-                val dots = v.findViewById<ImageView>(R.id.templateDots)
-                dots.id = trackTemplate.spacerId
-                parent.removeView(dots)
-                linearLayout.addView(dots)
-            }
         }
     }
 

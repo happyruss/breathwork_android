@@ -22,24 +22,6 @@ class BreathworkManager private constructor() {
     var inMeditation: Boolean? = null
     var trackCompleted: Boolean? = null
 
-    val isMultiPart: Boolean
-        get() = activeTrack!!.isMultiPart
-
-    var defaultDurationMinutes: Int
-        get() = user.customMeditationDurationMinutes
-        set(durationMinutes) {
-            val editor = settings!!.edit()
-            editor.putInt("savedCustomMeditationDurationMinutes", durationMinutes)
-            editor.apply()
-            this.user.customMeditationDurationMinutes = durationMinutes
-        }
-
-    val minimumDuration: Int
-        get() = activeTrack!!.minimumDuration
-
-    val userCompletedTrackLevel: Int
-        get() = user.completedTrackLevel
-
     val userTotalSecondsInMeditation: Int
         get() = user.totalSecondsInMeditation
 
@@ -47,11 +29,6 @@ class BreathworkManager private constructor() {
         get() = if (activeTrack == null) {
             null
         } else activeTrack!!.name
-
-    val activeTrackLongName: String?
-        get() = if (activeTrack == null) {
-            null
-        } else activeTrack!!.longName
 
     init {
         this.user = User()
@@ -61,11 +38,10 @@ class BreathworkManager private constructor() {
         this.clearCurrentTrack()
         this.activeTrackLevel = trackLevel
         val trackTemplate = trackTemplateFactory.getTrackTemplate(trackLevel)
-        this.activeTrack = Track(trackTemplate, context)
+        this.activeTrack = Track(trackTemplate, context, 1.0f, 1.0f, 1.0f, 1.0f)
     }
 
-    fun playActiveTrackFromBeginning(gapDuration: Int) {
-        this.activeTrack!!.setGapDuration(gapDuration)
+    fun playActiveTrackFromBeginning() {
         this.activeTrack!!.playFromBeginning()
     }
 
@@ -122,7 +98,7 @@ class BreathworkManager private constructor() {
 
     fun setDelegate(delegate: TrackDelegate) {
         if (this.activeTrack != null) {
-            this.activeTrack!!.setDelegate(delegate)
+            this.activeTrack!!.delegate = delegate
         }
     }
 

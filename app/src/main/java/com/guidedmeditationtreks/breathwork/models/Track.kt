@@ -1,143 +1,93 @@
 package com.guidedmeditationtreks.breathwork.models
 
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.media.SoundPool
 import android.os.CountDownTimer
+import com.guidedmeditationtreks.breathwork.R
 
-/**
- * Created by aerozero on 12/22/17.
- */
+class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Float, breathVolumeInit: Float, voiceVolumeInit: Float, breathSpeedInit: Float) {
 
-class Track(private val trackTemplate: TrackTemplate, context: Context) {
-
+    private var voiceMediaPlayer: MediaPlayer = MediaPlayer.create(context, trackTemplate.voiceResourceId)
+    private var musicMediaPlayer: MediaPlayer? = null
     private var remainingTime: Int = 0
     private var isPaused: Boolean = false
     private var timer: CountDownTimer? = null
+    private var trackTemplateProperty = trackTemplate
+    private val soundPool: SoundPool
+    private val breathSoundId: Int
+    private var breathStreamId: Int? = null
+    private var musicVolume: Float = musicVolumeInit
+    private var breathVolume: Float = breathVolumeInit
+    private var voiceVolume: Float = voiceVolumeInit
+    private var breathIsPlaying: Boolean = false
+    private var breathSpeed: Float = breathSpeedInit
 
-    private val playerPart1: MediaPlayer
-    private var gapDuration: Int = 0
-
-    private val part1Duration: Int
-    private var part2Duration: Int = 0
-    var minimumDuration: Int = 0
-        private set
-    private var totalDuration: Int = 0
-
-    private var playerPart2: MediaPlayer? = null
-
-    private var delegate: TrackDelegate? = null
-
-    val isMultiPart: Boolean
-        get() = this.trackTemplate.isMultiPart
-
-    val name: String
-        get() = trackTemplate.name
-
-    val longName: String
-        get() = trackTemplate.longName
-
+    var delegate: TrackDelegate? = null
+    val name = trackTemplate.name
+    val duration: Int
 
     init {
-
-        //initialize the audio files
-        this.playerPart1 = MediaPlayer.create(context, trackTemplate.part1Resource)
-        //playerPart1.start(); // no need to call prepare(); create() does that for you
-
-        this.part1Duration = this.playerPart1.duration / 1000
-
-        if (this.trackTemplate.isMultiPart) {
-            this.playerPart2 = MediaPlayer.create(context, trackTemplate.part2Resource)
-            this.part2Duration = this.playerPart2!!.duration / 1000
-            this.minimumDuration = this.part1Duration + this.part2Duration
-        } else {
-            this.minimumDuration = this.part1Duration
+        duration = voiceMediaPlayer.duration
+        remainingTime = duration / 1000
+        if (trackTemplate.musicResourceId != null) {
+            musicMediaPlayer = MediaPlayer.create(context, trackTemplate.musicResourceId)
         }
-        this.totalDuration = this.minimumDuration
-        this.remainingTime = this.totalDuration
-    }
+        val attributes = AudioAttributes.Builder().apply {
+            setUsage(AudioAttributes.USAGE_GAME)
+            setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+        }.build()
 
-    fun setGapDuration(gapDuration: Int) {
-        this.gapDuration = gapDuration
-        if (this.trackTemplate.isMultiPart) {
-            this.totalDuration = this.gapDuration + this.part1Duration + this.part2Duration
-        } else {
-            this.totalDuration = this.part1Duration
-        }
-        this.remainingTime = this.totalDuration
-    }
+        soundPool = SoundPool.Builder().apply {
+            setMaxStreams(1)
+            setAudioAttributes(attributes)
+        }.build()
 
-    private fun createTimer(seconds: Int) {
-
-        val milliseconds = seconds * 1000
-        timer = object : CountDownTimer(milliseconds.toLong(), 1000) {
-
-            override fun onTick(millisUntilFinished: Long) {
-                remainingTime--
-                delegate!!.trackTimeRemainingUpdated(remainingTime)
-
-                if (totalDuration - remainingTime < part1Duration) {
-                    if (!playerPart1.isPlaying) {
-                        playerPart1.start()
-                    }
-                }
-
-                if (remainingTime > 0 && trackTemplate.isMultiPart) {
-                    if (remainingTime < part2Duration) {
-                        if (!playerPart2!!.isPlaying) {
-                            playerPart2!!.start()
-                        }
-                    }
-                }
-            }
-
-            override fun onFinish() {
-                delegate!!.trackTimeRemainingUpdated(0)
-                delegate!!.trackEnded()
-            }
-
-        }.start()
+        breathSoundId = soundPool.load(context, R.raw.breathloop, 3)
     }
 
     fun playFromBeginning() {
-        this.createTimer(this.totalDuration)
+        this.createTimer(this.duration)
         this.isPaused = false
-        this.playerPart1.start()
     }
 
-    private fun pause() {
-        timer!!.cancel()
-        this.isPaused = true
-        if (this.playerPart1.isPlaying) {
-            this.playerPart1.pause()
-        }
-        if (this.trackTemplate.isMultiPart) {
-            if (this.playerPart2!!.isPlaying) {
-                this.playerPart2!!.pause()
-            }
-        }
-    }
 
-    private fun resume() {
+    fun resume() {
         this.createTimer(this.remainingTime)
         this.isPaused = false
     }
 
-    fun stop() {
-        //        this.remainingTime = this.totalDuration;
-        //        this.isPaused = false;
-        if (playerPart1.isPlaying) {
-            this.playerPart1.stop()
+    fun pause() {
+        (timer as CountDownTimer).cancel()
+        this.isPaused = true
+        if (voiceMediaPlayer.isPlaying) {
+            voiceMediaPlayer.pause()
         }
-        if (this.trackTemplate.isMultiPart) {
-            if (playerPart2!!.isPlaying) {
-                this.playerPart2!!.stop()
+        if (musicMediaPlayer != null && (musicMediaPlayer as MediaPlayer).isPlaying) {
+            (musicMediaPlayer as MediaPlayer).pause()
+            if (breathStreamId != null) {
+                soundPool.pause(breathStreamId as Int)
+            }
+        }
+    }
+
+    fun stop() {
+        if (voiceMediaPlayer.isPlaying) {
+            voiceMediaPlayer.stop()
+        }
+        if (musicMediaPlayer != null && (musicMediaPlayer as MediaPlayer).isPlaying) {
+            (musicMediaPlayer as MediaPlayer).stop()
+            if (breathStreamId != null) {
+                soundPool.stop(breathStreamId as Int)
             }
         }
         if (timer != null) {
-            timer!!.cancel()
+            (timer as CountDownTimer).cancel()
             timer = null
         }
     }
+
 
     fun pauseOrResume() {
         if (this.isPaused) {
@@ -147,8 +97,75 @@ class Track(private val trackTemplate: TrackTemplate, context: Context) {
         }
     }
 
-    fun setDelegate(delegate: TrackDelegate) {
-        this.delegate = delegate
+
+    fun setVoiceMediaPlayerVolume(vol: Float) {
+        this.voiceVolume = vol
+        this.voiceMediaPlayer.setVolume(vol, vol)
+    }
+    fun setMusicMediaPlayerVolume(vol: Float) {
+        this.musicVolume = vol
+        if (musicMediaPlayer != null) {
+            (musicMediaPlayer as MediaPlayer).setVolume(vol, vol)
+        }
+    }
+    fun setBreathMediaPlayerVolume(vol: Float) {
+        this.breathVolume = vol
+        if (breathStreamId != null) {
+            soundPool.setVolume(breathStreamId as Int, vol, vol)
+        }
     }
 
+    fun setBreathSpeed(speed: Float) {
+        breathSpeed = speed
+        if (breathStreamId != null) {
+            soundPool.stop(breathStreamId as Int)
+            breathStreamId = soundPool.play(breathSoundId, breathVolume, breathVolume, 1, -1, breathSpeed)
+        }
+    }
+
+    private fun createTimer(seconds: Int) {
+
+        val milliseconds = seconds * 1000
+        timer = object : CountDownTimer(milliseconds.toLong(), 1000) {
+
+            override fun onTick(millisUntilFinished: Long) {
+                remainingTime--
+                if (delegate !== null) {
+                    (delegate as TrackDelegate).trackTimeRemainingUpdated(remainingTime)
+                }
+
+                if (!voiceMediaPlayer.isPlaying) {
+                    voiceMediaPlayer.start()
+                }
+                if (musicMediaPlayer !== null && !(musicMediaPlayer as MediaPlayer).isPlaying) {
+                    (musicMediaPlayer as MediaPlayer).start()
+                    if (trackTemplateProperty.breathStartSeconds !== null && trackTemplateProperty.breathStopSeconds !== null) {
+                        val breathStartSeconds = (trackTemplateProperty.breathStartSeconds as Int)
+                        val breathStopSeconds = (trackTemplateProperty.breathStopSeconds as Int)
+                        val currentPosition = voiceMediaPlayer.currentPosition
+                        val breathShouldBePlaying = (currentPosition >= breathStartSeconds) && (currentPosition <= breathStopSeconds)
+                        if (breathShouldBePlaying) {
+                            if (!breathIsPlaying) {
+                                breathStreamId = soundPool.play(breathSoundId, breathVolume, breathVolume, 1, -1, breathSpeed)
+                                breathIsPlaying = true
+                            }
+                        } else {
+                            if (breathIsPlaying && breathStreamId != null) {
+                                soundPool.stop(breathStreamId as Int)
+                                breathIsPlaying = false
+                            }
+                        }
+                    }
+                }
+            }
+
+            override fun onFinish() {
+                if (delegate !== null) {
+                    (delegate as TrackDelegate).trackTimeRemainingUpdated(0)
+                    (delegate as TrackDelegate).trackEnded()
+                }
+            }
+
+        }.start()
+    }
 }

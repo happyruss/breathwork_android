@@ -49,7 +49,7 @@ class MeditationActivity : AppCompatActivity(), TrackDelegate {
         if (!(breathworkManager.inMeditation)!!) { //workaround for screen rotation
             val intent = intent
             val gapAmount = intent.getIntExtra("gapAmount", 0)
-            breathworkManager.playActiveTrackFromBeginning(gapAmount)
+            breathworkManager.playActiveTrackFromBeginning()
             breathworkManager.inMeditation = true
         }
         if (!(breathworkManager?.trackCompleted)!!) {
@@ -88,7 +88,7 @@ class MeditationActivity : AppCompatActivity(), TrackDelegate {
         playPauseButton!!.visibility = View.VISIBLE
         timerTextView = findViewById(R.id.timerTextView)
         meditationNameTextView = findViewById(R.id.meditationNameTextView)
-        meditationNameTextView!!.text = breathworkManager.activeTrackLongName
+        meditationNameTextView!!.text = breathworkManager.activeTrackName
         meditationNameTextView!!.setShadowLayer(2.0f, 2.0f, 2.0f, R.color.colorShadow)
         clearClickBackgroundView = findViewById(R.id.clearClickBackground)
         blackClickBackgroundView = findViewById(R.id.blackClickBackground)

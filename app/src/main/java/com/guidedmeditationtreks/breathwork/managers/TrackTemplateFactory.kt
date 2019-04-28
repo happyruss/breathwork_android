@@ -3,36 +3,27 @@ package com.guidedmeditationtreks.breathwork.managers
 import com.guidedmeditationtreks.breathwork.R
 import com.guidedmeditationtreks.breathwork.models.TrackTemplate
 
-import java.util.jar.Attributes
-
-/**
- * Created by aerozero on 12/22/17.
- */
-
 class TrackTemplateFactory {
+    companion object {
+        val singleton = TrackTemplateFactory()
+    }
 
-    private val trackTemplates: Array<TrackTemplate> = arrayOf(
-            TrackTemplate("Step Into Your Power", "Silent Meditation", R.raw.m01music, R.raw.m01voice)
-            , TrackTemplate("Step Into Your Power", "Silent Meditation", R.raw.m01music, R.raw.m01voice)
-            , TrackTemplate("Step Into Your Power", "Silent Meditation", R.raw.m01music, R.raw.m01voice)
-            , TrackTemplate("Step Into Your Power", "Silent Meditation", R.raw.m01music, R.raw.m01voice)
-            , TrackTemplate("Step Into Your Power", "Silent Meditation", R.raw.m01music, R.raw.m01voice)
-    )
+    val trackTemplates: Array<TrackTemplate>
 
-    val requireMeditationsBeDoneInOrder = true
     val trackTemplateCount: Int
         get() = trackTemplates.size
-
-    init {
-
-    }
 
     fun getTrackTemplate(index: Int): TrackTemplate {
         return trackTemplates[index]
     }
 
-    companion object {
+    init {
+        val trackTemplateIntro = TrackTemplate("Introduction", R.raw.introduction)
+        val trackTemplates0 = TrackTemplate("Stepping Into Your Power", R.raw.m01voice, R.raw.m01music, 99, 1396)
+        val trackTemplates1 = TrackTemplate("Grieving and Celebrating a Loss", R.raw.m02voice, R.raw.m02music, 143, 1428)
+        val trackTemplates2 = TrackTemplate("Healing Sexual Abuse", R.raw.m03voice, R.raw.m03music, 167, 1620)
+        val trackTemplates3 = TrackTemplate("Abundance", R.raw.m04voice, R.raw.m04music, 103, 1652)
 
-        var singleton = TrackTemplateFactory()
+        trackTemplates =  arrayOf(trackTemplateIntro, trackTemplates0, trackTemplates1, trackTemplates2, trackTemplates3)
     }
 }

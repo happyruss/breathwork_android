@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     private var meditationTotalTimeTextView: TextView? = null
 
     fun didTapTimerButton(v: View) {
-//        presentAlerts(0)
+        presentAlerts(0)
     }
 
 
@@ -123,44 +123,15 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-//    private fun presentAlerts(trackLevel: Int) {
-//        presentCountdownLengthAlertOrRun(trackLevel)
-//    }
+    private fun presentAlerts(trackLevel: Int) {
+//        presentCountdownLengthAlert()
+    }
+
+//    private fun presentCountdownLengthAlert(trackLevel: Int) {
 //
-//    private fun presentCountdownLengthAlertOrRun(trackLevel: Int) {
-//
-//        breathworkManager.initTrackAtLevel(trackLevel, this)
-//        val minDurationSeconds = breathworkManager.minimumDuration
-//        val minDurationMinutes = minDurationSeconds / 60 + 2
-//
-//        if (!breathworkManager.isMultiPart) {
-//            this.runMeditationWithGap(0)
-//        } else {
-//            val layoutInflater = LayoutInflater.from(this)
+//        val layoutInflater = LayoutInflater.from(this)
 //            val promptView = layoutInflater.inflate(R.layout.prompt, null)
 //            val alertD = AlertDialog.Builder(this).create()
-//
-//            val btnMinimum = promptView.findViewById<Button>(R.id.btnMinimum)
-//            btnMinimum.setText(String.format(Locale.getDefault(), "%d minutes (minimum)", minDurationMinutes))
-//
-//            val btnHour = promptView.findViewById<Button>(R.id.btnHour)
-//            val btnFortyFive = promptView.findViewById<Button>(R.id.btnFortyFive)
-//
-//            btnMinimum.setOnClickListener {
-//                runMeditationWithFullLength(minDurationMinutes * 60)
-//                alertD.dismiss()
-//            }
-//
-//            btnHour.setOnClickListener {
-//                runMeditationWithFullLength(60 * 60)
-//                alertD.dismiss()
-//            }
-//
-//            btnFortyFive.setOnClickListener {
-//                runMeditationWithFullLength(45 * 60)
-//                alertD.dismiss()
-//            }
-//
 //
 //            val btnCustom = promptView.findViewById<Button>(R.id.btnCustom)
 //            val userInput = promptView.findViewById<EditText>(R.id.userInput)

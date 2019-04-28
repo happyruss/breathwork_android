@@ -139,21 +139,21 @@ class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Flo
                 }
                 if (musicMediaPlayer !== null && !(musicMediaPlayer as MediaPlayer).isPlaying) {
                     (musicMediaPlayer as MediaPlayer).start()
-                    if (trackTemplateProperty.breathStartSeconds !== null && trackTemplateProperty.breathStopSeconds !== null) {
-                        val breathStartSeconds = (trackTemplateProperty.breathStartSeconds as Int)
-                        val breathStopSeconds = (trackTemplateProperty.breathStopSeconds as Int)
-                        val currentPosition = voiceMediaPlayer.currentPosition
-                        val breathShouldBePlaying = (currentPosition >= breathStartSeconds) && (currentPosition <= breathStopSeconds)
-                        if (breathShouldBePlaying) {
-                            if (!breathIsPlaying) {
-                                breathStreamId = soundPool.play(breathSoundId, breathVolume, breathVolume, 1, -1, breathSpeed)
-                                breathIsPlaying = true
-                            }
-                        } else {
-                            if (breathIsPlaying && breathStreamId != null) {
-                                soundPool.stop(breathStreamId as Int)
-                                breathIsPlaying = false
-                            }
+                }
+                if (trackTemplateProperty.breathStartSeconds !== null && trackTemplateProperty.breathStopSeconds !== null) {
+                    val breathStartSeconds = (trackTemplateProperty.breathStartSeconds as Int)
+                    val breathStopSeconds = (trackTemplateProperty.breathStopSeconds as Int)
+                    val currentPosition = voiceMediaPlayer.currentPosition / 1000
+                    val breathShouldBePlaying = (currentPosition >= breathStartSeconds) && (currentPosition <= breathStopSeconds)
+                    if (breathShouldBePlaying) {
+                        if (!breathIsPlaying) {
+                            breathStreamId = soundPool.play(breathSoundId, breathVolume, breathVolume, 1, -1, breathSpeed)
+                            breathIsPlaying = true
+                        }
+                    } else {
+                        if (breathIsPlaying && breathStreamId != null) {
+                            soundPool.stop(breathStreamId as Int)
+                            breathIsPlaying = false
                         }
                     }
                 }

@@ -93,9 +93,8 @@ class MeditationActivity : AppCompatActivity(), TrackDelegate {
         clearClickBackgroundView = findViewById(R.id.clearClickBackground)
         blackClickBackgroundView = findViewById(R.id.blackClickBackground)
 
-        clearClickBackgroundView!!.setOnClickListener { blackClickBackgroundView!!.visibility = View.VISIBLE }
-
-        blackClickBackgroundView!!.setOnClickListener { blackClickBackgroundView!!.visibility = View.INVISIBLE }
+//        clearClickBackgroundView!!.setOnClickListener { blackClickBackgroundView!!.visibility = View.VISIBLE }
+//        blackClickBackgroundView!!.setOnClickListener { blackClickBackgroundView!!.visibility = View.INVISIBLE }
 
         blackClickBackgroundView!!.z = 50f
         playPauseButton!!.z = 20f

@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 
 import com.guidedmeditationtreks.breathwork.models.Track
 import com.guidedmeditationtreks.breathwork.models.TrackDelegate
-import com.guidedmeditationtreks.breathwork.models.TrackTemplate
 import com.guidedmeditationtreks.breathwork.models.User
 
 /**
@@ -39,11 +38,18 @@ class BreathworkManager private constructor() {
         this.user = User()
     }
 
+    fun initCountdownTimer(millisecondsToCountdown: Int, context: Context) {
+        this.clearCurrentTrack()
+        this.activeTrackLevel = 0
+        val trackTemplate = trackTemplateFactory.getTrackTemplate(0)
+        this.activeTrack = Track(trackTemplate, context, savedMusicVolume, savedBreathVolume, savedVoiceVolume, savedBreathSpeed, millisecondsToCountdown)
+    }
+
     fun initTrackAtLevel(trackLevel: Int, context: Context) {
         this.clearCurrentTrack()
         this.activeTrackLevel = trackLevel
         val trackTemplate = trackTemplateFactory.getTrackTemplate(trackLevel)
-        this.activeTrack = Track(trackTemplate, context, 1.0f, 1.0f, 1.0f, 1.0f)
+        this.activeTrack = Track(trackTemplate, context, savedMusicVolume, savedBreathVolume, savedVoiceVolume, savedBreathSpeed, 0)
     }
 
     fun playActiveTrackFromBeginning() {
@@ -74,6 +80,10 @@ class BreathworkManager private constructor() {
 
     }
 
+    fun releaseSoundPoolOnActiveTrack() {
+        activeTrack!!.releaseSoundPool()
+    }
+
     fun setSettings(settings: SharedPreferences) {
         this.settings = settings
         savedBreathVolume = settings.getFloat("savedBreathVolume", 0.5f)
@@ -87,6 +97,9 @@ class BreathworkManager private constructor() {
 
         val totalSecondsInMeditation = settings.getInt("totalSecondsInMeditation", 0)
         this.user.totalSecondsInMeditation = totalSecondsInMeditation
+
+        val savedCustomMeditationDurationMinutes = settings.getInt("savedCustomMeditationDurationMinutes", 0)
+        this.user.customMeditationDurationMinutes = savedCustomMeditationDurationMinutes
     }
 
     fun incrementTotalSecondsInMeditation() {
@@ -137,6 +150,18 @@ class BreathworkManager private constructor() {
         editor.putFloat("savedMusicVolume", this.user.savedMusicVolume)
         editor.apply()
     }
+
+    fun setDefaultDurationMinutes(durationMinutes: Int) {
+        val editor = settings!!.edit()
+        editor.putInt("savedCustomMeditationDurationMinutes", durationMinutes)
+        editor.apply()
+        this.user.customMeditationDurationMinutes = durationMinutes
+    }
+
+    fun getDefaultDurationMinutes(): Int {
+        return user.customMeditationDurationMinutes
+    }
+
 
     companion object {
         var singleton = BreathworkManager()

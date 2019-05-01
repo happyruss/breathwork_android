@@ -18,12 +18,13 @@ class TrackTemplateFactory {
     }
 
     init {
+        val trackTemplateTimer = TrackTemplate("Timer")
         val trackTemplateIntro = TrackTemplate("Introduction", R.raw.introduction)
         val trackTemplates0 = TrackTemplate("Stepping Into Your Power", R.raw.m01voice, R.raw.m01music, 99, 1396)
         val trackTemplates1 = TrackTemplate("Grieving and Celebrating a Loss", R.raw.m02voice, R.raw.m02music, 143, 1428)
         val trackTemplates2 = TrackTemplate("Healing Sexual Abuse", R.raw.m03voice, R.raw.m03music, 167, 1620)
         val trackTemplates3 = TrackTemplate("Abundance", R.raw.m04voice, R.raw.m04music, 103, 1652)
 
-        trackTemplates =  arrayOf(trackTemplateIntro, trackTemplates0, trackTemplates1, trackTemplates2, trackTemplates3)
+        trackTemplates =  arrayOf(trackTemplateTimer, trackTemplateIntro, trackTemplates0, trackTemplates1, trackTemplates2, trackTemplates3)
     }
 }

@@ -9,39 +9,6 @@
     android:background="@color/colorBlack"
     >
 
-    <Button
-        android:id="@+id/btnMinimum"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:background="@drawable/rounded_button"
-        android:textColor="@color/colorTitle"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        />
-
-    <Button
-        android:id="@+id/btnFortyFive"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="45 Minutes"
-        android:background="@drawable/rounded_button"
-        android:textColor="@color/colorTitle"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        />
-
-    <Button
-        android:id="@+id/btnHour"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="60 Minutes (recommended)"
-        android:background="@drawable/rounded_button"
-        android:textColor="@color/colorTitle"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        />
-
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

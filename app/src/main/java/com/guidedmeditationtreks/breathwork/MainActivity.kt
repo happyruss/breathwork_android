@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     private var meditationTotalTimeTextView: TextView? = null
 
     fun didTapTimerButton(v: View) {
-        presentAlerts(0)
+        presentCountdownLengthAlert()
     }
 
 
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
         val trackCount = trackTemplateFactory.trackTemplateCount
 
-        for (i in 0 until trackCount) {
+        for (i in 1 until trackCount) {
             val trackTemplate = trackTemplateFactory.getTrackTemplate(i)
             trackTemplate.buttonId = View.generateViewId()
 
@@ -123,81 +123,53 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun presentAlerts(trackLevel: Int) {
-//        presentCountdownLengthAlert()
+
+    private fun presentCountdownLengthAlert() {
+
+        val layoutInflater = LayoutInflater.from(this)
+        val promptView = layoutInflater.inflate(R.layout.prompt, null)
+        val alertD = AlertDialog.Builder(this).create()
+
+        val btnCustom = promptView.findViewById<Button>(R.id.btnCustom)
+        val userInput = promptView.findViewById<EditText>(R.id.userInput)
+
+        var customValue = breathworkManager.getDefaultDurationMinutes()
+
+        userInput.setText(String.format(Locale.getDefault(), "%d", customValue))
+        userInput.setOnClickListener { userInput.setText("") }
+
+        btnCustom.setOnClickListener(View.OnClickListener {
+            val userValue: Int?
+            try {
+                userValue = Integer.parseInt(userInput.text.toString())
+            } catch (ex: NumberFormatException) {
+                presentInvalidCustomCountdownAlert()
+                return@OnClickListener
+            }
+
+            breathworkManager.setDefaultDurationMinutes(userValue)
+            breathworkManager.initCountdownTimer(userValue * 1000 * 60, this)
+
+            val myIntent = Intent(this@MainActivity, MeditationActivity::class.java)
+            startActivityForResult(myIntent, MEDITATION_ACTIVITY_REQUEST_CODE)
+            alertD.dismiss()
+        })
+        alertD.setView(promptView)
+        alertD.show()
     }
 
-//    private fun presentCountdownLengthAlert(trackLevel: Int) {
-//
-//        val layoutInflater = LayoutInflater.from(this)
-//            val promptView = layoutInflater.inflate(R.layout.prompt, null)
-//            val alertD = AlertDialog.Builder(this).create()
-//
-//            val btnCustom = promptView.findViewById<Button>(R.id.btnCustom)
-//            val userInput = promptView.findViewById<EditText>(R.id.userInput)
-//
-//            var customValue = breathworkManager.defaultDurationMinutes
-//            if (customValue < minDurationMinutes) {
-//                customValue = minDurationMinutes
-//            }
-//
-//            userInput.setText(String.format(Locale.getDefault(), "%d", customValue))
-//            userInput.setOnClickListener { userInput.setText("") }
-//
-//            btnCustom.setOnClickListener(View.OnClickListener {
-//                val userValue: Int?
-//                try {
-//                    userValue = Integer.parseInt(userInput.text.toString())
-//                } catch (ex: NumberFormatException) {
-//                    presentInvalidCustomCountdownAlert(trackLevel, minDurationMinutes)
-//                    return@OnClickListener
-//                }
-//
-//                if (userValue < minDurationMinutes) {
-//                    presentInvalidCustomCountdownAlert(trackLevel, minDurationMinutes)
-//                } else {
-//                    breathworkManager.defaultDurationMinutes = userValue
-//                    runMeditationWithFullLength(userValue * 60)
-//                    alertD.dismiss()
-//                }
-//            })
-//            alertD.setView(promptView)
-//            alertD.show()
-//        }
-//    }
-//
-//    private fun presentInvalidCustomCountdownAlert(trackLevel: Int, minDurationMinutes: Int) {
-//        val alertDialogBuilder = AlertDialog.Builder(this)
-//        val minAlertString = String.format(Locale.getDefault(), "Length for this meditation must be at least %d minutes", minDurationMinutes)
-//
-//        alertDialogBuilder.setTitle("Invalid Custom Time")
-//        alertDialogBuilder
-//                .setMessage(minAlertString)
-//                .setCancelable(false)
-//                .setPositiveButton("OK", DialogInterface.OnClickListener { dialog, id -> dialog.cancel() })
-//        val alertDialog = alertDialogBuilder.create()
-//        alertDialog.show()
-//    }
-//
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//
-//        if (requestCode == MEDITATION_ACTIVITY_REQUEST_CODE)
-//            secureButtons()
-//    }
-//
-//    private fun runMeditationWithGap(gapAmount: Int) {
-//        val myIntent = Intent(this@MainActivity, MeditationActivity::class.java)
-//        myIntent.putExtra("gapAmount", gapAmount)
-//        //        MainActivity.this.startActivity(myIntent);
-//        startActivityForResult(myIntent, MEDITATION_ACTIVITY_REQUEST_CODE)
-//    }
-//
-//    private fun runMeditationWithFullLength(fullLengthSeconds: Int) {
-//        val minDurationSeconds = breathworkManager.minimumDuration
-//        val gapLength = fullLengthSeconds - minDurationSeconds
-//        runMeditationWithGap(gapLength)
-//    }
+    private fun presentInvalidCustomCountdownAlert() {
+        val alertDialogBuilder = AlertDialog.Builder(this)
+        val minAlertString = String.format(Locale.getDefault(), "Invalid time specified")
+
+        alertDialogBuilder.setTitle("Invalid Custom Time")
+        alertDialogBuilder
+                .setMessage(minAlertString)
+                .setCancelable(false)
+                .setPositiveButton("OK", DialogInterface.OnClickListener { dialog, id -> dialog.cancel() })
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
+    }
 
     companion object {
         val PREFS_NAME = "BreathworkPrefs"

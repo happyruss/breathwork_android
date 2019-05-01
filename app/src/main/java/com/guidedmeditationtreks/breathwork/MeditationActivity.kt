@@ -2,20 +2,16 @@ package com.guidedmeditationtreks.breathwork
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
-import android.content.Intent
-import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.view.Window
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.ToggleButton
 
 import com.guidedmeditationtreks.breathwork.managers.BreathworkManager
 import com.guidedmeditationtreks.breathwork.models.TrackDelegate
+import kotlinx.android.synthetic.main.activity_meditation.*
 
 import java.util.Locale
 
@@ -57,9 +53,40 @@ class MeditationActivity : AppCompatActivity(), TrackDelegate, SeekBar.OnSeekBar
             breathworkManager.playActiveTrackFromBeginning()
             breathworkManager.inMeditation = true
         }
-        if (!(breathworkManager?.trackCompleted)!!) {
+        if (!(breathworkManager!!.trackCompleted)!!) {
             isInMeditation = true
             breathworkManager.userStartedTrack()
+        }
+
+        val isActiveTrackIntroduction = breathworkManager.activeTrackName == "Introduction"
+        val isActiveTrackTimer = breathworkManager.activeTrackName == "Timer"
+
+        if (isActiveTrackIntroduction || isActiveTrackTimer) {
+            musicVolumeSeekBar!!.visibility = android.view.View.INVISIBLE
+            musicVolumeSeekBarTextView.visibility = android.view.View.INVISIBLE
+        } else {
+            musicVolumeSeekBar!!.visibility = android.view.View.VISIBLE
+            musicVolumeSeekBarTextView.visibility = android.view.View.VISIBLE
+        }
+
+        if (isActiveTrackTimer) {
+            voiceVolumeSeekBar!!.visibility = android.view.View.INVISIBLE
+            voiceVolumeSeekBarTextView.visibility = android.view.View.INVISIBLE
+        } else {
+            voiceVolumeSeekBar!!.visibility = android.view.View.VISIBLE
+            voiceVolumeSeekBarTextView.visibility = android.view.View.VISIBLE
+        }
+
+        if (isActiveTrackIntroduction) {
+            breathSpeedSeekBar!!.visibility = View.INVISIBLE
+            breathVolumeSeekBar!!.visibility = View.INVISIBLE
+            breathSpeedSeekBarTextView!!.visibility = View.INVISIBLE
+            breathVolumeSeekBarTextView!!.visibility = View.INVISIBLE
+        } else {
+            breathSpeedSeekBar!!.visibility = View.VISIBLE
+            breathVolumeSeekBar!!.visibility = View.VISIBLE
+            breathSpeedSeekBarTextView!!.visibility = View.VISIBLE
+            breathVolumeSeekBarTextView!!.visibility = View.VISIBLE
         }
     }
 
@@ -157,6 +184,7 @@ class MeditationActivity : AppCompatActivity(), TrackDelegate, SeekBar.OnSeekBar
         playPauseButton!!.visibility = View.INVISIBLE
         isInMeditation = false
         breathworkManager.trackCompleted = true
+        breathworkManager.releaseSoundPoolOnActiveTrack()
         closeActivity()
     }
 

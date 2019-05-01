@@ -10,4 +10,5 @@ class User {
     var savedVoiceVolume = 0.5f
     var savedMusicVolume = 0.5f
     var totalSecondsInMeditation: Int = 0
+    var customMeditationDurationMinutes: Int = 5
 }

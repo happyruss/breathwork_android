@@ -42,19 +42,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <TextView
-        android:id="@+id/appTitle"
-        fontPath="fonts/font-diner-coffee-service.otf"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:text="@string/app_name"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/colorTitle"
-        app:layout_constraintLeft_toRightOf="@id/backButton"
-        app:layout_constraintTop_toTopOf="@id/backButton" />
-
     <TextView
         android:id="@+id/timerTextView"
         android:layout_width="wrap_content"
@@ -107,7 +94,7 @@
             android:layout_marginBottom="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/appTitle"
+            app:layout_constraintTop_toBottomOf="@id/backButton"
     />
     <SeekBar
             android:id="@+id/breathVolumeSeekBar"

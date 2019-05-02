@@ -8,4 +8,9 @@
     <string name="timer_button_description">silent timer button</string>
     <string name="back">Back</string>
     <string name="app_info_link">app info link</string>
+
+    <string name="breath_volume">Breath Volume</string>
+    <string name="breath_speed">Breath Speed</string>
+    <string name="voice_volume">Voice Volume</string>
+    <string name="music_volume">Music Volume</string>
 </resources>

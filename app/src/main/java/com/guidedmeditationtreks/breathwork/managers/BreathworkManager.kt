@@ -16,11 +16,16 @@ import com.guidedmeditationtreks.breathwork.models.User
 class BreathworkManager private constructor() {
     private var settings: SharedPreferences? = null
     private val trackTemplateFactory = TrackTemplateFactory.singleton
-    private val user: User
+    val user: User
     private var activeTrack: Track? = null
     private var activeTrackLevel: Int = 0
     var inMeditation: Boolean? = null
     var trackCompleted: Boolean? = null
+
+    var savedBreathVolume: Float = 0.5f
+    var savedBreathSpeed: Float = 0.5f
+    var savedVoiceVolume: Float = 0.5f
+    var savedMusicVolume: Float = 0.5f
 
     val userTotalSecondsInMeditation: Int
         get() = user.totalSecondsInMeditation
@@ -61,30 +66,25 @@ class BreathworkManager private constructor() {
         trackCompleted = false
     }
 
-    private fun setCompletedTrack() {
-        if (this.activeTrackLevel > this.user.completedTrackLevel) {
-            this.user.completedTrackLevel = this.activeTrackLevel
-            val editor = settings!!.edit()
-            editor.putInt("savedCompletedLevel", this.activeTrackLevel)
-            editor.apply()
-        }
-    }
-
     fun userCompletedTrack() {
-        this.setCompletedTrack()
+
     }
 
     fun userStartedTrack() {
-        this.setCompletedTrack()
+
     }
 
     fun setSettings(settings: SharedPreferences) {
         this.settings = settings
-        val savedCompletedLevel = settings.getInt("savedCompletedLevel", 0)
-        this.user.completedTrackLevel = savedCompletedLevel
+        savedBreathVolume = settings.getFloat("savedBreathVolume", 0.5f)
+        this.user.savedBreathVolume = savedBreathVolume
+        savedBreathSpeed = settings.getFloat("savedBreathSpeed", 0.5f)
+        this.user.savedBreathSpeed = savedBreathSpeed
+        savedVoiceVolume = settings.getFloat("savedVoiceVolume", 0.5f)
+        this.user.savedVoiceVolume = savedVoiceVolume
+        savedMusicVolume = settings.getFloat("savedMusicVolume", 0.5f)
+        this.user.savedMusicVolume = savedMusicVolume
 
-        val savedCustomMeditationDurationMinutes = settings.getInt("savedCustomMeditationDurationMinutes", 0)
-        this.user.customMeditationDurationMinutes = savedCustomMeditationDurationMinutes
         val totalSecondsInMeditation = settings.getInt("totalSecondsInMeditation", 0)
         this.user.totalSecondsInMeditation = totalSecondsInMeditation
     }
@@ -102,8 +102,43 @@ class BreathworkManager private constructor() {
         }
     }
 
-    companion object {
+    fun setBreathVolume(vol: Float) {
+        activeTrack!!.setBreathMediaPlayerVolume(vol)
+        savedBreathVolume = vol
+        this.user.savedBreathVolume = vol
+        val editor = settings!!.edit()
+        editor.putFloat("savedBreathVolume", this.user.savedBreathVolume)
+        editor.apply()
+    }
 
+    fun setBreathSpeed(speed: Float) {
+        activeTrack!!.setBreathSpeed(speed)
+        savedBreathSpeed = speed
+        this.user.savedBreathSpeed = speed
+        val editor = settings!!.edit()
+        editor.putFloat("savedBreathSpeed", this.user.savedBreathSpeed)
+        editor.apply()
+    }
+
+    fun setVoiceVolume(vol: Float) {
+        activeTrack!!.setVoiceMediaPlayerVolume(vol)
+        savedVoiceVolume = vol
+        this.user.savedVoiceVolume = vol
+        val editor = settings!!.edit()
+        editor.putFloat("savedVoiceVolume", this.user.savedVoiceVolume)
+        editor.apply()
+    }
+
+    fun setMusicVolume(vol: Float) {
+        activeTrack!!.setMusicMediaPlayerVolume(vol)
+        savedMusicVolume = vol
+        this.user.savedMusicVolume = vol
+        val editor = settings!!.edit()
+        editor.putFloat("savedMusicVolume", this.user.savedMusicVolume)
+        editor.apply()
+    }
+
+    companion object {
         var singleton = BreathworkManager()
     }
 }

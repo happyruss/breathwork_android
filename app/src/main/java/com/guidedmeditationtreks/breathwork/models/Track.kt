@@ -52,7 +52,6 @@ class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Flo
         this.isPaused = false
     }
 
-
     fun resume() {
         this.createTimer(this.remainingTime)
         this.isPaused = false
@@ -116,7 +115,9 @@ class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Flo
     }
 
     fun setBreathSpeed(speed: Float) {
-        breathSpeed = speed
+//      formula to convert scale
+//      ((Input - InputLow) / (InputHigh - InputLow)) * (OutputHigh - OutputLow) + OutputLow;
+        breathSpeed = ((speed - 0f) / (1.0f - 0f)) * (1.25f - 0.75f) + 0.75f
         if (breathStreamId != null) {
             soundPool.stop(breathStreamId as Int)
             breathStreamId = soundPool.play(breathSoundId, breathVolume, breathVolume, 1, -1, breathSpeed)

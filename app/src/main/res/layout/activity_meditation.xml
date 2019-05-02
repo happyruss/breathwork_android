@@ -67,11 +67,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/playPauseButton" />
 
-    <View
-        android:id="@+id/clearClickBackground"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
-
 
     <ToggleButton
         android:id="@+id/playPauseButton"
@@ -102,11 +97,81 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/blackClickBackground"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="@color/colorBlack"
-        android:visibility="invisible" />
+    <TextView
+            android:id="@+id/breathVolumeSeekBarTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/breath_volume"
+            android:textColor="@color/colorTitle"
+            android:textSize="17sp"
+            android:layout_marginBottom="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/appTitle"
+    />
+    <SeekBar
+            android:id="@+id/breathVolumeSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/breathVolumeSeekBarTextView"
+    />
 
+    <TextView
+            android:id="@+id/breathSpeedSeekBarTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/breath_speed"
+            android:textColor="@color/colorTitle"
+            android:textSize="17sp"
+            android:layout_marginBottom="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/breathVolumeSeekBar"
+    />
+    <SeekBar
+            android:id="@+id/breathSpeedSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/breathSpeedSeekBarTextView"
+            android:padding="0dp"
+    />
+
+    <TextView
+            android:id="@+id/voiceVolumeSeekBarTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/voice_volume"
+            android:textColor="@color/colorTitle"
+            android:textSize="17sp"
+            android:layout_marginBottom="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/breathSpeedSeekBar"
+    />
+    <SeekBar
+            android:id="@+id/voiceVolumeSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/voiceVolumeSeekBarTextView"
+            android:padding="0dp"
+    />
+
+    <TextView
+            android:id="@+id/musicVolumeSeekBarTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/music_volume"
+            android:textColor="@color/colorTitle"
+            android:textSize="17sp"
+            android:layout_marginBottom="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/voiceVolumeSeekBar"
+    />
+    <SeekBar
+            android:id="@+id/musicVolumeSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/musicVolumeSeekBarTextView"
+    />
 </android.support.constraint.ConstraintLayout>

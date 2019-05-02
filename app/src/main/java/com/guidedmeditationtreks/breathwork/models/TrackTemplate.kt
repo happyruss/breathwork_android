@@ -2,7 +2,7 @@ package com.guidedmeditationtreks.breathwork.models
 
 class TrackTemplate(
     trackName: String,
-    trackVoiceResourceId: Int,
+    trackVoiceResourceId: Int? = null,
     trackMusicResourceId: Int? = null,
     secondsWhenBreathStarts: Int? = null,
     secondsWhenBreathStops: Int? = null
@@ -14,6 +14,4 @@ class TrackTemplate(
     val breathStopSeconds = secondsWhenBreathStops
 
     var buttonId: Int = 0
-    var spacerId: Int = 0
-
 }

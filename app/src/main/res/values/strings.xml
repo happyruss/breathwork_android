@@ -12,5 +12,5 @@
     <string name="breath_volume">Breath Volume</string>
     <string name="breath_speed">Breath Speed</string>
     <string name="voice_volume">Voice Volume</string>
-    <string name="music_volume">Music Volume</string>
+    <string name="music_volume">Ambiance Volume</string>
 </resources>

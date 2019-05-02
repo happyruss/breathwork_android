@@ -7,9 +7,9 @@ import android.media.SoundPool
 import android.os.CountDownTimer
 import com.guidedmeditationtreks.breathwork.R
 
-class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Float, breathVolumeInit: Float, voiceVolumeInit: Float, breathSpeedInit: Float) {
+class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Float, breathVolumeInit: Float, voiceVolumeInit: Float, breathSpeedInit: Float, noVoiceDurationMilliseconds: Int) {
 
-    private var voiceMediaPlayer: MediaPlayer = MediaPlayer.create(context, trackTemplate.voiceResourceId)
+    private var voiceMediaPlayer: MediaPlayer? = null
     private var musicMediaPlayer: MediaPlayer? = null
     private var remainingTime: Int = 0
     private var isPaused: Boolean = false
@@ -26,10 +26,15 @@ class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Flo
 
     var delegate: TrackDelegate? = null
     val name = trackTemplate.name
-    val duration: Int
+    private val duration: Int
 
     init {
-        duration = voiceMediaPlayer.duration
+        if (trackTemplate.voiceResourceId != null) {
+            voiceMediaPlayer = MediaPlayer.create(context, trackTemplate.voiceResourceId)
+            duration = voiceMediaPlayer!!.duration
+        } else {
+            duration = noVoiceDurationMilliseconds
+        }
         remainingTime = duration / 1000
         if (trackTemplate.musicResourceId != null) {
             musicMediaPlayer = MediaPlayer.create(context, trackTemplate.musicResourceId)
@@ -48,7 +53,7 @@ class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Flo
     }
 
     fun playFromBeginning() {
-        this.createTimer(this.duration)
+        this.createTimer(this.duration / 1000)
         this.isPaused = false
     }
 
@@ -60,26 +65,28 @@ class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Flo
     fun pause() {
         (timer as CountDownTimer).cancel()
         this.isPaused = true
-        if (voiceMediaPlayer.isPlaying) {
-            voiceMediaPlayer.pause()
+        if (voiceMediaPlayer != null && (voiceMediaPlayer as MediaPlayer).isPlaying) {
+            (voiceMediaPlayer as MediaPlayer).pause()
         }
         if (musicMediaPlayer != null && (musicMediaPlayer as MediaPlayer).isPlaying) {
             (musicMediaPlayer as MediaPlayer).pause()
-            if (breathStreamId != null) {
-                soundPool.pause(breathStreamId as Int)
-            }
+        }
+        if (breathStreamId != null) {
+            soundPool.pause(breathStreamId as Int)
+            breathIsPlaying = false
         }
     }
 
     fun stop() {
-        if (voiceMediaPlayer.isPlaying) {
-            voiceMediaPlayer.stop()
+        if (voiceMediaPlayer != null && (voiceMediaPlayer as MediaPlayer).isPlaying) {
+            (voiceMediaPlayer as MediaPlayer).stop()
         }
         if (musicMediaPlayer != null && (musicMediaPlayer as MediaPlayer).isPlaying) {
             (musicMediaPlayer as MediaPlayer).stop()
-            if (breathStreamId != null) {
-                soundPool.stop(breathStreamId as Int)
-            }
+        }
+        if (breathStreamId != null) {
+            soundPool.stop(breathStreamId as Int)
+            breathIsPlaying = false
         }
         if (timer != null) {
             (timer as CountDownTimer).cancel()
@@ -98,29 +105,44 @@ class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Flo
 
 
     fun setVoiceMediaPlayerVolume(vol: Float) {
-        this.voiceVolume = vol
-        this.voiceMediaPlayer.setVolume(vol, vol)
+        if (this.voiceVolume != vol) {
+            this.voiceVolume = vol
+            if (voiceMediaPlayer != null) {
+                (voiceMediaPlayer as MediaPlayer).setVolume(vol, vol)
+            }
+        }
     }
     fun setMusicMediaPlayerVolume(vol: Float) {
-        this.musicVolume = vol
-        if (musicMediaPlayer != null) {
-            (musicMediaPlayer as MediaPlayer).setVolume(vol, vol)
+        if (this.musicVolume != vol) {
+            this.musicVolume = vol
+            if (musicMediaPlayer != null) {
+                (musicMediaPlayer as MediaPlayer).setVolume(vol, vol)
+            }
         }
     }
     fun setBreathMediaPlayerVolume(vol: Float) {
-        this.breathVolume = vol
-        if (breathStreamId != null) {
-            soundPool.setVolume(breathStreamId as Int, vol, vol)
+        if (this.breathVolume != vol) {
+            this.breathVolume = vol
+            if (breathStreamId != null) {
+                soundPool.setVolume(breathStreamId as Int, vol, vol)
+            }
         }
     }
 
     fun setBreathSpeed(speed: Float) {
 //      formula to convert scale
 //      ((Input - InputLow) / (InputHigh - InputLow)) * (OutputHigh - OutputLow) + OutputLow;
-        breathSpeed = ((speed - 0f) / (1.0f - 0f)) * (1.25f - 0.75f) + 0.75f
+        val proposedBreathSpeed = ((speed - 0f) / (1.0f - 0f)) * (1.25f - 0.75f) + 0.75f
+
+        if (breathSpeed == proposedBreathSpeed) {
+            return
+        }
+
+        breathSpeed = proposedBreathSpeed
         if (breathStreamId != null) {
             soundPool.stop(breathStreamId as Int)
             breathStreamId = soundPool.play(breathSoundId, breathVolume, breathVolume, 1, -1, breathSpeed)
+            breathIsPlaying = true
         }
     }
 
@@ -135,27 +157,31 @@ class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Flo
                     (delegate as TrackDelegate).trackTimeRemainingUpdated(remainingTime)
                 }
 
-                if (!voiceMediaPlayer.isPlaying) {
-                    voiceMediaPlayer.start()
+                if (voiceMediaPlayer != null && !voiceMediaPlayer!!.isPlaying) {
+                    (voiceMediaPlayer as MediaPlayer).start()
                 }
                 if (musicMediaPlayer !== null && !(musicMediaPlayer as MediaPlayer).isPlaying) {
                     (musicMediaPlayer as MediaPlayer).start()
                 }
+                var breathShouldBePlaying = false
                 if (trackTemplateProperty.breathStartSeconds !== null && trackTemplateProperty.breathStopSeconds !== null) {
                     val breathStartSeconds = (trackTemplateProperty.breathStartSeconds as Int)
                     val breathStopSeconds = (trackTemplateProperty.breathStopSeconds as Int)
-                    val currentPosition = voiceMediaPlayer.currentPosition / 1000
-                    val breathShouldBePlaying = (currentPosition >= breathStartSeconds) && (currentPosition <= breathStopSeconds)
-                    if (breathShouldBePlaying) {
-                        if (!breathIsPlaying) {
-                            breathStreamId = soundPool.play(breathSoundId, breathVolume, breathVolume, 1, -1, breathSpeed)
-                            breathIsPlaying = true
-                        }
-                    } else {
-                        if (breathIsPlaying && breathStreamId != null) {
-                            soundPool.stop(breathStreamId as Int)
-                            breathIsPlaying = false
-                        }
+                    val currentPosition = voiceMediaPlayer!!.currentPosition / 1000
+                    breathShouldBePlaying = (currentPosition >= breathStartSeconds) && (currentPosition <= breathStopSeconds)
+                } else if (trackTemplateProperty.voiceResourceId == null) {
+                    // denotes the countdown timer case
+                    breathShouldBePlaying = remainingTime > 0
+                }
+                if (breathShouldBePlaying) {
+                    if (!breathIsPlaying) {
+                        breathStreamId = soundPool.play(breathSoundId, breathVolume, breathVolume, 1, -1, breathSpeed)
+                        breathIsPlaying = true
+                    }
+                } else {
+                    if (breathIsPlaying && breathStreamId != null) {
+                        soundPool.stop(breathStreamId as Int)
+                        breathIsPlaying = false
                     }
                 }
             }
@@ -168,5 +194,9 @@ class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Flo
             }
 
         }.start()
+    }
+
+    fun releaseSoundPool() {
+        soundPool.release()
     }
 }

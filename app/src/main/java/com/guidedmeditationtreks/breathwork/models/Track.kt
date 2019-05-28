@@ -22,7 +22,7 @@ class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Flo
     private var breathVolume: Float = breathVolumeInit
     private var voiceVolume: Float = voiceVolumeInit
     private var breathIsPlaying: Boolean = false
-    private var breathSpeed: Float = breathSpeedInit
+    private var breathSpeed: Float = ((breathSpeedInit - 0f) / (1.0f - 0f)) * (1.25f - 0.75f) + 0.75f
 
     var delegate: TrackDelegate? = null
     val name = trackTemplate.name
@@ -31,6 +31,7 @@ class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Flo
     init {
         if (trackTemplate.voiceResourceId != null) {
             voiceMediaPlayer = MediaPlayer.create(context, trackTemplate.voiceResourceId)
+            voiceMediaPlayer!!.setVolume(voiceVolumeInit, voiceVolumeInit)
             duration = voiceMediaPlayer!!.duration
         } else {
             duration = noVoiceDurationMilliseconds
@@ -38,6 +39,7 @@ class Track(trackTemplate: TrackTemplate, context: Context, musicVolumeInit: Flo
         remainingTime = duration / 1000
         if (trackTemplate.musicResourceId != null) {
             musicMediaPlayer = MediaPlayer.create(context, trackTemplate.musicResourceId)
+            musicMediaPlayer!!.setVolume(musicVolumeInit, musicVolumeInit)
         }
         val attributes = AudioAttributes.Builder().apply {
             setUsage(AudioAttributes.USAGE_GAME)
